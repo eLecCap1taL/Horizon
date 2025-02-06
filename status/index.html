@@ -116,6 +116,9 @@
             <div class="card-body">
                 <div>在线人数: <span id="total-online">0</span></div>
             </div>
+            <div class="card-body">
+                <div>最高在线人数: <span id="total-online-maxhistory">0</span></div>
+            </div>
             <div class="card-footer">
                 最后同步时间：<span id="last-sync-time">正在加载...</span>
             </div>
@@ -151,6 +154,7 @@
     
         function updateUI(data) {
             document.getElementById("total-online").textContent = data.number;
+            document.getElementById("total-online-maxhistory").textContent = data.number_max;
     
             let mapStatsHtml = '';
             for (let mapName in data.maps) {
