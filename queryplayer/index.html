@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <link rel="icon" href="/images/dark.ico" sizes="16x16">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizon 在线玩家查询</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .steamidio{
+            /* font-size: 36px; */
+            margin-bottom: 40px;
+            /* color: #000; 黑色 */
+            text-align: center; /* 使标题居中 */
+            /* text-shadow: none; 移除阴影 */
+            /* animation: fadeIn 1.5s ease-in-out; */
+        }
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px; /* 增加与卡片的距离 */
+            color: #000; /* 黑色 */
+            text-align: center; /* 使标题居中 */
+            text-shadow: none; /* 移除阴影 */
+            /* animation: fadeIn 1.5s ease-in-out; */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            width: 400px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        input[type="text"] {
+            width: calc(100% - 40px);
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        button {
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Horizon 在线玩家查询</h1>
+        <p class="steamidio">一个检索 steamid 的网站: https://steamid.io/lookup</p>
+        <div class="card">
+            <input type="text" id="steamid" placeholder="请输入SteamID">
+            <button onclick="queryPlayer()">查询</button>
+            <div class="result" id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        async function queryPlayer() {
+            const steamid = document.getElementById('steamid').value;
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '查询中...';
+
+            try {
+                const response = await fetch(`https://cs2.cap1tal.top:11450/status?type=queryplayer&steamid=${steamid}`);
+                const data = await response.json();
+
+                if (data.status === 1) {
+                    resultDiv.innerHTML = `
+                        <div class="success">查询成功！</div>
+                        <div>玩家当前地图: ${data.data.map}</div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = '<div class="error">未找到玩家信息</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">查询失败，请检查网络连接</div>';
+            }
+        }
+    </script>
+</body>
+</html>
