@@ -1,0 +1,70 @@
+Horizon 5.2
+
+省流：
+五身位自动 Mirage VIP 瞬爆快烟
+自动道具（暂无轮盘）
+
+---
+
+【新功能】自动道具
+完成了自动道具模块，但暂时没有添加轮盘
+添加了最新的五个身位的 Mirage VIP瞬爆快烟
+前往 keyPreference 进行绑定。先按你绑定的道具键选定道具，再按瞄准键瞄准，最后按投掷键投掷
+新自动道具模块可以简单地添加你自己的道具，具体见下文
+
+【调整】
+修改了 keyPreference 和 OptPreference 的格式
+中英双语以方便国外用户
+期望新格式更易读
+
+---
+
+如何添加自己的道具到自动道具模块
+
+打开 Horizon/src/modules/grenade/list.json
+
+里面每个道具由以下的格式描述（以Mirage VIP 1号位 瞬爆烟）为例
+
+{
+    "id": "mirage_windowsmoke_fast_1",
+    "name_zh_cn": "Mirage VIP瞬爆烟\\n一号位",
+    "name_en_us": "Mirage Instant Window\\nSpawn 1",
+    "map": "mirage",
+    "type": "smoke",
+    "priority": 1,
+    "throw_command": "hzNade_wjumpthrow_L",
+    "pre_throw_command": "",
+    "post_throw_command": "",
+    "angle": {
+        "yaw": -171.717000,
+        "pitch": -41.971962
+    },
+    "position": {
+        "x": 1296.000000,
+        "y": -352.000000
+    }
+}
+
+从上到下分别是：
+道具ID（代码唯一识别符）
+中文名（以后会用于轮盘）
+英文名（以后会用于轮盘）
+地图
+投掷物类型（smoke,flash,molo,HE,decoy）
+投掷指令（内置了左键前跳投，即hzNade_wjumpthrow_L，你也可以自己实现一个投掷命令填写与此）
+投掷前命令（例如下蹲需要在这里填写+duck，会在瞄准时执行）
+投掷后命令（例如下蹲需要在这里填写-duck，会在投掷后执行）
+角度：（用于瞄准）
+    yaw （横向角度，getpos得到的setang的第2个参数）
+    pitch （纵向角度，getpos得到的setang的第1个参数）
+位置：（暂时无用，以后用于与跑图模块联动）
+    x   （坐标1，getpos得到的setpos的第1个参数）
+    y   （坐标2，getpos得到的setpos的第2个参数）
+
+
+添加完毕后执行 generate.py，在同目录的 list.cfg 里查看你的道具生成
+
+---
+
+如果觉得cfg好还有米，可以打赏我，码在压缩包里
+没有米也没关系，都哥们，使用Horizon就是对我的最大支持
