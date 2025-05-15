@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>道具配置编辑器</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        button, input[type="file"] {
+            padding: 8px 16px;
+            font-size: 16px;
+        }
+        .grenade-list {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .grenade-entry {
+            border: 1px solid #ccc;
+            background: #fff;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .grenade-header {
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .grenade-body {
+            display: none;
+            padding: 15px;
+            background: #f9f9f9;
+        }
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+        .field-group label {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .field-group input, .field-group textarea {
+            padding: 6px;
+            font-size: 14px;
+        }
+        .inline-group {
+            display: flex;
+            gap: 10px;
+        }
+        .inline-group .field-group {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>道具配置编辑器</h1>
+    <h4>
+        游戏内控制台输入 getpos 可以获得当前瞄点信息（完美跑图无法获取）
+    </h4>
+    <h4>
+        如果提示没有权限 控制台输入 sv_cheats 1 开启作弊
+    </h4>
+    <h4>
+        如果没有任何输出 控制台输入 log_flags General -donotecho 打开全局输出
+    </h4>
+    <div class="controls">
+        <input type="file" id="fileInput" accept="application/json">
+        <button onclick="addGrenade()">新增道具</button>
+        <button onclick="downloadJSON()">下载JSON</button>
+    </div>
+    <div id="editor" class="grenade-list"></div>
+
+    <script>
+        let jsonData = { grenades: [] };
+
+        const labels = {
+            name_zh_cn: "游戏内中文名",
+            name_en_us: "游戏内英文名",
+            map: "所在地图",
+            type: "道具类型",
+            priority: "轮盘内排布优先级",
+            throw_command: "投掷命令",
+            pre_throw_command: "投掷前缀命令",
+            post_throw_command: "投掷后缀命令"
+        };
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    jsonData = JSON.parse(e.target.result);
+                    renderEditor();
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function renderEditor() {
+            const container = document.getElementById('editor');
+            container.innerHTML = '';
+
+            jsonData.grenades.forEach((grenade, index) => {
+                const entry = document.createElement('div');
+                entry.className = 'grenade-entry';
+
+                const header = document.createElement('div');
+                header.className = 'grenade-header';
+                header.textContent = grenade.name_zh_cn?.split('\n')[0] || grenade.name_en_us?.split('\n')[0] || `道具 ${index+1}`;
+                header.addEventListener('click', () => {
+                    body.style.display = body.style.display === 'none' ? 'block' : 'none';
+                });
+
+                const body = document.createElement('div');
+                body.className = 'grenade-body';
+
+                for (const key in labels) {
+                    const group = document.createElement('div');
+                    group.className = 'field-group';
+
+                    const label = document.createElement('label');
+                    label.textContent = labels[key];
+
+                    const input = document.createElement(key.includes('command') ? 'textarea' : 'input');
+                    input.value = grenade[key] ?? '';
+                    input.addEventListener('input', (e) => {
+                        jsonData.grenades[index][key] = e.target.value;
+                    });
+
+                    group.appendChild(label);
+                    group.appendChild(input);
+                    body.appendChild(group);
+                }
+
+                // angle: yaw, pitch
+                const angleGroup = document.createElement('div');
+                angleGroup.className = 'inline-group';
+
+                const yawField = document.createElement('div');
+                yawField.className = 'field-group';
+                const yawLabel = document.createElement('label');
+                yawLabel.textContent = '角度 Yaw';
+                const yawInput = document.createElement('input');
+                yawInput.type = 'number';
+                yawInput.value = grenade.angle?.yaw ?? 0;
+                yawInput.addEventListener('input', (e) => {
+                    jsonData.grenades[index].angle.yaw = parseFloat(e.target.value);
+                });
+                yawField.appendChild(yawLabel);
+                yawField.appendChild(yawInput);
+
+                const pitchField = document.createElement('div');
+                pitchField.className = 'field-group';
+                const pitchLabel = document.createElement('label');
+                pitchLabel.textContent = '角度 Pitch';
+                const pitchInput = document.createElement('input');
+                pitchInput.type = 'number';
+                pitchInput.value = grenade.angle?.pitch ?? 0;
+                pitchInput.addEventListener('input', (e) => {
+                    jsonData.grenades[index].angle.pitch = parseFloat(e.target.value);
+                });
+                pitchField.appendChild(pitchLabel);
+                pitchField.appendChild(pitchInput);
+
+                angleGroup.appendChild(yawField);
+                angleGroup.appendChild(pitchField);
+                body.appendChild(angleGroup);
+
+                // position: x, y
+                const posGroup = document.createElement('div');
+                posGroup.className = 'inline-group';
+
+                const xField = document.createElement('div');
+                xField.className = 'field-group';
+                const xLabel = document.createElement('label');
+                xLabel.textContent = '位置 X';
+                const xInput = document.createElement('input');
+                xInput.type = 'number';
+                xInput.value = grenade.position?.x ?? 0;
+                xInput.addEventListener('input', (e) => {
+                    jsonData.grenades[index].position.x = parseFloat(e.target.value);
+                });
+                xField.appendChild(xLabel);
+                xField.appendChild(xInput);
+
+                const yField = document.createElement('div');
+                yField.className = 'field-group';
+                const yLabel = document.createElement('label');
+                yLabel.textContent = '位置 Y';
+                const yInput = document.createElement('input');
+                yInput.type = 'number';
+                yInput.value = grenade.position?.y ?? 0;
+                yInput.addEventListener('input', (e) => {
+                    jsonData.grenades[index].position.y = parseFloat(e.target.value);
+                });
+                yField.appendChild(yLabel);
+                yField.appendChild(yInput);
+
+                posGroup.appendChild(xField);
+                posGroup.appendChild(yField);
+                body.appendChild(posGroup);
+
+                entry.appendChild(header);
+                entry.appendChild(body);
+                container.appendChild(entry);
+            });
+        }
+
+        function addGrenade() {
+            ID = `grenade_${Date.now()}`
+            const defaultGrenade = {
+                id: `${ID}`,
+                name_zh_cn: `${ID}`,
+                name_en_us: `${ID}`,
+                map: "other",
+                type: "smoke",
+                priority: 1,
+                throw_command: "hzNade_throw_L",
+                pre_throw_command: "",
+                post_throw_command: "",
+                angle: { yaw: 0, pitch: 0 },
+                position: { x: 0, y: 0 }
+            };
+            jsonData.grenades.push(defaultGrenade);
+            renderEditor();
+        }
+
+        function downloadJSON() {
+            const jsonStr = JSON.stringify(jsonData, null, 4);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'list.json';
+            a.click();
+
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
