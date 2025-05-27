@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SCFG Generator</title>
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <script src="https://unpkg.com/blockly/lua_compressed.js"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: rgba(255, 255, 255, 0);
+            background-image: url(./Image1.png) !important;
+            /* background-image: url(http://localhost:11455/kita.gif) !important; */
+            background-repeat: no-repeat;
+            background-size: cover;
+            /*     background-position: center; */
+            background-attachment: fixed;
+        }
+
+        #blocklyDiv {
+            height: 480px;
+            width: 100%;
+        }
+
+        #codeArea {
+            width: 100%;
+            min-height: 200px;
+        }
+
+        #emptyArea {
+            width: 100%;
+            height: 50px;
+        }
+
+        /* 设置 Blockly 编辑器容器的样式 */
+        .card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(1000px);
+            border-radius: 15px;
+            box-shadow: 0 0px 10px 0 rgba(31, 38, 135, 0.37);
+            padding: 20px;
+            margin: 40px auto;
+            width: 90%;
+            max-width: 1200px;
+        }
+        .codecard {
+            background: rgba(255, 255, 255, 0.701);
+            backdrop-filter: blur(10px);
+            /* -webkit-backdrop-filter: blur(1000px); */
+            border-radius: 15px;
+            box-shadow: 0 0px 10px 0 rgba(31, 38, 135, 0.37);
+            padding: 20px;
+            margin: 40px auto;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        #blocklyDiv {
+            height: 600px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
+            background-color: #f9f9f9;
+            margin-bottom: 20px;
+        }
+
+
+        /* 美化工具箱分类标签 */
+        .blocklyTreeLabel {
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+        }
+
+        /* 设置工具箱背景和文字颜色 */
+        .blocklyToolboxDiv {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        /* 设置滚动条样式 */
+        .blocklyScrollbarHorizontal,
+        .blocklyScrollbarVertical {
+            background-color: #e0e0e0;
+        }
+
+        .blocklyTreeRow {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .blocklyTreeRow:hover {
+            background-color: #e0e0e0;
+            transform: translateX(5px);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .button-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button-container button:hover {
+            background-color: #357ab8;
+        }
+
+        .upload-wrapper {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .upload-label {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            background-color: #4a90e2;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .upload-label:hover {
+            background-color: #357ab8;
+        }
+
+        h2 {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 36px;
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #ffffff, #ffffff);
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <h2>SCFG Generator</h2>
+    <div class="upload-wrapper">
+        <input type="file" id="uploadXml" style="display: none;" />
+        <label for="uploadXml" class="upload-label">上传 XML 文件</label>
+    </div>
+    <div class="card">
+        <div id="blocklyDiv"></div>
+    </div>
+
+    <div class="button-container">
+        <button id="downloadXmlBtn">下载 XML</button>
+        <button id="generateBtn" onclick="generateCode()">生成 Lua</button>
+        <button id="downloadBtn" style="display: none;">下载 Lua</button>
+    </div>
+    <div class="codecard">
+        <pre id="codeArea"></pre>
+    </div>
+    <pre id="emptyArea"></pre>
+
+    <xml id="toolbox" style="display: none">
+        <category name="逻辑" colour="%{BKY_LOGIC_HUE}">
+            <block type="controls_if"></block>
+            <block type="logic_compare"></block>
+            <block type="logic_operation"></block>
+            <block type="logic_boolean"></block>
+            <block type="logic_null"></block>
+            <block type="logic_ternary"></block>
+        </category>
+        <category name="循环" colour="%{BKY_LOOPS_HUE}">
+            <block type="controls_repeat_ext">
+                <value name="TIMES">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="controls_whileUntil"></block>
+            <block type="controls_for">
+                <value name="FROM">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="TO">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+                <value name="BY">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="controls_forEach"></block>
+            <block type="controls_flow_statements"></block>
+        </category>
+        <category name="数学" colour="%{BKY_MATH_HUE}">
+            <block type="math_number">
+                <field name="NUM">123</field>
+            </block>
+            <block type="math_arithmetic"></block>
+            <block type="math_single"></block>
+            <block type="math_trig"></block>
+            <block type="math_constant"></block>
+            <block type="math_number_property"></block>
+            <block type="math_round"></block>
+            <block type="math_on_list"></block>
+            <block type="math_modulo"></block>
+            <block type="math_constrain">
+                <value name="LOW">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="HIGH">
+                    <shadow type="math_number">
+                        <field name="NUM">100</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_random_int">
+                <value name="FROM">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+                <value name="TO">
+                    <shadow type="math_number">
+                        <field name="NUM">100</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="math_random_float"></block>
+        </category>
+        <category name="文本" colour="%{BKY_TEXTS_HUE}">
+            <block type="text"></block>
+            <block type="text_join"></block>
+            <block type="text_append">
+                <value name="TEXT">
+                    <shadow type="text"></shadow>
+                </value>
+            </block>
+            <block type="text_length">
+                <value name="VALUE">
+                    <shadow type="text">
+                        <field name="TEXT">abc</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="text_isEmpty">
+                <value name="VALUE">
+                    <shadow type="text">
+                        <field name="TEXT"></field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="text_indexOf">
+                <value name="VALUE">
+                    <block type="variables_get">
+                        <field name="VAR">text</field>
+                    </block>
+                </value>
+                <value name="FIND">
+                    <shadow type="text">
+                        <field name="TEXT">abc</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="text_charAt">
+                <value name="VALUE">
+                    <block type="variables_get">
+                        <field name="VAR">text</field>
+                    </block>
+                </value>
+            </block>
+            <block type="text_getSubstring">
+                <value name="STRING">
+                    <block type="variables_get">
+                        <field name="VAR">text</field>
+                    </block>
+                </value>
+            </block>
+            <block type="text_changeCase">
+                <value name="TEXT">
+                    <shadow type="text">
+                        <field name="TEXT">abc</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="text_trim">
+                <value name="TEXT">
+                    <shadow type="text">
+                        <field name="TEXT">abc</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="text_print">
+                <value name="TEXT">
+                    <shadow type="text">
+                        <field name="TEXT">abc</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="text_prompt_ext">
+                <mutation type="TEXT"></mutation>
+                <value name="TEXT">
+                    <shadow type="text">
+                        <field name="TEXT">abc</field>
+                    </shadow>
+                </value>
+            </block>
+        </category>
+        <category name="变量" colour="%{BKY_VARIABLES_HUE}" custom="VARIABLE"></category>
+        <category name="函数" colour="%{BKY_PROCEDURES_HUE}" custom="PROCEDURE"></category>
+    </xml>
+
+    <script>
+        const customTheme = Blockly.Theme.defineTheme('customTheme', {
+            'base': Blockly.Themes.Classic,
+            'blockStyles': {
+                'logic_blocks': {
+                    'colourPrimary': '#4a148c',
+                    'colourSecondary': '#AD7BE9',
+                    'colourTertiary': '#CDB6E9'
+                },
+                // 添加其他块样式
+            },
+            'categoryStyles': {
+                'logic_category': {
+                    'colour': '#4a148c'
+                },
+                // 添加其他分类样式
+            },
+            'componentStyles': {
+                'workspaceBackgroundColour': '#f5f5f5',
+                'toolboxBackgroundColour': '#ffffff',
+                'toolboxForegroundColour': '#000000',
+                'flyoutBackgroundColour': '#e0e0e0',
+                'flyoutForegroundColour': '#000000',
+                'flyoutOpacity': 1,
+                'scrollbarColour': '#c0c0c0',
+                'scrollbarOpacity': 0.7,
+                'insertionMarkerColour': '#000000',
+                'insertionMarkerOpacity': 0.3,
+                'markerColour': '#000000',
+                'cursorColour': '#d0d0d0'
+            }
+        });
+
+        const workspace = Blockly.inject('blocklyDiv', {
+            toolbox: document.getElementById('toolbox'),
+            theme: customTheme
+            // renderer:"thrasos"
+        });
+
+        function generateCode() {
+            const code = Blockly.Lua.workspaceToCode(workspace);
+            document.getElementById('codeArea').textContent = code;
+            document.getElementById('downloadBtn').style.display = code == '' ? 'none' : 'inline-block';
+        }
+
+        document.getElementById('downloadBtn').addEventListener('click', function () {
+            const code = document.getElementById('codeArea').textContent;
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'script.lua';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        document.getElementById('uploadXml').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const xmlText = event.target.result;
+                try {
+                    const xml = Blockly.utils.xml.textToDom(xmlText);
+                    Blockly.Xml.domToWorkspace(xml, workspace);
+                } catch (e) {
+                    alert('无法解析上传的文件。请确保它是有效的 Blockly XML 文件。');
+                    console.log(e)
+                }
+            };
+            reader.readAsText(file);
+        });
+        document.getElementById('downloadXmlBtn').addEventListener('click', function () {
+            const xml = Blockly.Xml.workspaceToDom(workspace);
+            const xmlText = Blockly.Xml.domToPrettyText(xml);
+            const blob = new Blob([xmlText], { type: 'text/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'blockly_project.xml';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+    </script>
+</body>
+
+</html>
