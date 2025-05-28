@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>SCFG Generator</title>
+    <script src="https://unpkg.com/blockly"></script>
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
     <script src="https://unpkg.com/blockly/lua_compressed.js"></script>
     <style>
@@ -48,6 +49,7 @@
             width: 90%;
             max-width: 1200px;
         }
+
         .codecard {
             background: rgba(255, 255, 255, 0.701);
             backdrop-filter: blur(10px);
@@ -175,15 +177,7 @@
     <pre id="emptyArea"></pre>
 
     <xml id="toolbox" style="display: none">
-        <category name="逻辑" colour="%{BKY_LOGIC_HUE}">
-            <block type="controls_if"></block>
-            <block type="logic_compare"></block>
-            <block type="logic_operation"></block>
-            <block type="logic_boolean"></block>
-            <block type="logic_null"></block>
-            <block type="logic_ternary"></block>
-        </category>
-        <category name="循环" colour="%{BKY_LOOPS_HUE}">
+        <category name="控制" colour="%{BKY_LOOPS_HUE}">
             <block type="controls_repeat_ext">
                 <value name="TIMES">
                     <shadow type="math_number">
@@ -191,145 +185,34 @@
                     </shadow>
                 </value>
             </block>
-            <block type="controls_whileUntil"></block>
-            <block type="controls_for">
-                <value name="FROM">
-                    <shadow type="math_number">
-                        <field name="NUM">1</field>
-                    </shadow>
-                </value>
-                <value name="TO">
-                    <shadow type="math_number">
-                        <field name="NUM">10</field>
-                    </shadow>
-                </value>
-                <value name="BY">
-                    <shadow type="math_number">
-                        <field name="NUM">1</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="controls_forEach"></block>
-            <block type="controls_flow_statements"></block>
-        </category>
-        <category name="数学" colour="%{BKY_MATH_HUE}">
-            <block type="math_number">
-                <field name="NUM">123</field>
-            </block>
-            <block type="math_arithmetic"></block>
-            <block type="math_single"></block>
-            <block type="math_trig"></block>
-            <block type="math_constant"></block>
-            <block type="math_number_property"></block>
-            <block type="math_round"></block>
-            <block type="math_on_list"></block>
-            <block type="math_modulo"></block>
-            <block type="math_constrain">
-                <value name="LOW">
-                    <shadow type="math_number">
-                        <field name="NUM">1</field>
-                    </shadow>
-                </value>
-                <value name="HIGH">
-                    <shadow type="math_number">
-                        <field name="NUM">100</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="math_random_int">
-                <value name="FROM">
-                    <shadow type="math_number">
-                        <field name="NUM">1</field>
-                    </shadow>
-                </value>
-                <value name="TO">
-                    <shadow type="math_number">
-                        <field name="NUM">100</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="math_random_float"></block>
+            <block type="lua_sleep"></block>
         </category>
         <category name="文本" colour="%{BKY_TEXTS_HUE}">
             <block type="text"></block>
-            <block type="text_join"></block>
-            <block type="text_append">
-                <value name="TEXT">
-                    <shadow type="text"></shadow>
-                </value>
-            </block>
-            <block type="text_length">
-                <value name="VALUE">
-                    <shadow type="text">
-                        <field name="TEXT">abc</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="text_isEmpty">
-                <value name="VALUE">
-                    <shadow type="text">
-                        <field name="TEXT"></field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="text_indexOf">
-                <value name="VALUE">
-                    <block type="variables_get">
-                        <field name="VAR">text</field>
-                    </block>
-                </value>
-                <value name="FIND">
-                    <shadow type="text">
-                        <field name="TEXT">abc</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="text_charAt">
-                <value name="VALUE">
-                    <block type="variables_get">
-                        <field name="VAR">text</field>
-                    </block>
-                </value>
-            </block>
-            <block type="text_getSubstring">
-                <value name="STRING">
-                    <block type="variables_get">
-                        <field name="VAR">text</field>
-                    </block>
-                </value>
-            </block>
-            <block type="text_changeCase">
-                <value name="TEXT">
-                    <shadow type="text">
-                        <field name="TEXT">abc</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="text_trim">
-                <value name="TEXT">
-                    <shadow type="text">
-                        <field name="TEXT">abc</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="text_print">
-                <value name="TEXT">
-                    <shadow type="text">
-                        <field name="TEXT">abc</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="text_prompt_ext">
-                <mutation type="TEXT"></mutation>
-                <value name="TEXT">
-                    <shadow type="text">
-                        <field name="TEXT">abc</field>
-                    </shadow>
-                </value>
+        </category>
+        <category name="数字" colour="%{BKY_MATH_HUE}">
+            <block type="math_number">
+                <field name="NUM">123</field>
             </block>
         </category>
-        <category name="变量" colour="%{BKY_VARIABLES_HUE}" custom="VARIABLE"></category>
         <category name="函数" colour="%{BKY_PROCEDURES_HUE}" custom="PROCEDURE"></category>
+        <category name="动作" colour="160">
+            <block type="lua_forward"></block>
+            <block type="lua_back"></block>
+            <block type="lua_left"></block>
+            <block type="lua_right"></block>
+            <block type="lua_duck"></block>
+            <block type="lua_attack"></block>
+            <block type="lua_attack2"></block>
+            <block type="lua_sprint"></block>
+            <block type="lua_lookatweapon"></block>
+            <block type="lua_turnleft"></block>
+            <block type="lua_turnright"></block>
+            <block type="lua_turnup"></block>
+            <block type="lua_turndown"></block>
+            <block type="lua_jump"></block>
+            <block type="lua_jumpbug"></block>
+        </category>
     </xml>
 
     <script>
@@ -422,6 +305,9 @@
         });
 
     </script>
+    <script src="./baseCommands.js"></script>
+    <script src="./instantCommands.js"></script>
+    <script src="./otherCommands.js"></script>
 </body>
 
 </html>
