@@ -4,7 +4,7 @@ Horizon 5.5 --- 2025.7.31
 
 更换了新的视角重置方法，现在道具cfg和身法cfg都可以正常工作了
 
-需要去github下载新的scfg重新编译身法
+需要去github下载新的scfg重新编译身法https://github.com/eLecCap1taL/scfg
 
 ---
 
