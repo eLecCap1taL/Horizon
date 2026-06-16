@@ -1,0 +1,5 @@
+Test_Wait 0.5
+
+HorizonTicker
+
+Test_Run "../../csgo/cfg/Horizon/src/core/testscript/.vtest"

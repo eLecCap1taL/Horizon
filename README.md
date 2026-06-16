@@ -1,4 +1,4 @@
-<h1 align="center"><img src="./Misc/Icons/Horizon_dark.png" width="64" align="center"> Horizon</h1>
+<h1 align="center"><img src="./assets/Icons/Horizon_dark.png" width="64" align="center"> Horizon</h1>
 
 <p align="center">
     <a href="https://horizoncfg.top">
