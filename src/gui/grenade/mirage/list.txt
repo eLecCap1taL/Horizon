@@ -1,7 +1,0 @@
-mirage_windowsmoke_fast_1
-mirage_windowsmoke_fast_2
-mirage_windowsmoke_fast_3
-mirage_windowsmoke_fast_4
-mirage_windowsmoke_fast_5
-mirage_a1_ct_1
-mirage_a2_molo
