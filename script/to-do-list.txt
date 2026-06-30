@@ -1,0 +1,16 @@
+1. 研究testscript与帧率的影响
+- 与exec_async不同，testscript的多余空行不增加时延。似乎只有特定的指令才会引入时延
+- Test_RunFrame可以引入一帧的延迟
+
+- 每次Test_Run会怎么样？
+-- 似乎是瞬时的，Test_Run不会引入时延。做一组对照看一看
+-- 单个Test_RunFrame也不能使得sys_info中的时间变化。这似乎有些迷惑。是不是锁定64tick?
+-- 有点复杂。我们不妨先认定Test_Run引入一帧的时延。在我们不使用Test_Runframe的情况下这应该可以忽略？
+-- 我们来看一看Test_Wait是否受帧率影响，我们希望这不会
+-- 使用Test_Wait 0.05*20在64fps下Curtime时延1.25左右
+-- 使用Test_Wait 0.05*20在200fps下Curtime时延1.03左右
+-- 依旧区
+-- 思考一下
+
+
+2. 重新建立移动时间与急停时间的映射

@@ -1,5 +1,30 @@
-Test_Wait 0.5
-
-HorizonTicker
+Test_Wait 4
+// HorizonTicker
+// clear
+// echo 1
+// sys_info
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// Test_Wait 0.05
+// sys_info
+// echo 2
+// HorizonTicker
 
 Test_Run "../../csgo/cfg/Horizon/src/core/testscript/.vtest"
