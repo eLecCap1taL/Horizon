@@ -1,5 +1,5 @@
-Test_Wait 4
-// HorizonTicker
+Test_Wait 0.001
+HorizonTicker
 // clear
 // echo 1
 // sys_info

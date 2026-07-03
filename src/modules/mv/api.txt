@@ -1,0 +1,11 @@
+提供
+- mv.mv.basic.[key|joy].fb.[F|B|S]
+- mv.mv.basic.[key|joy].rl.[R|L|S]
+- mv.basic.rev (不建议使用, 建议使用mv.rev)
+- mv.basic.reset
+
+- mv.rev.enable
+- mv.rev.disable
+- mv.rev.flip
+- mv.rev.norm
+- mv.rev.reset
