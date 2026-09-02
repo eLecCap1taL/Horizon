@@ -1,0 +1,4 @@
+inctrl.[fb/rl].use_autostop.[enable/disable] 用于切换 在某个方向上 使用 autstop 或 直接调用 mv
+inctrl.[fb.rl].use_[joy/key] 用于切换 inctrl 在某个方向上使用的底层移动（仅在use_autostop = false）时有效
+inctrl.[fb/rl].use_[norm/socd/null] 用于切换 inctrl 在某个方向上的移动逻辑
+API 均不支持热切换。热切换还需要正确处理、清除已有的移动。必须直接在 Preference 中指定，并伴随 autoexec 一次性正确加载
